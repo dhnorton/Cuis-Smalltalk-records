@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2156] on 9 February 2015 at 11:02:22.915843 am'!
-'Description Contains classes Record and Field which are useful for defining fixed-length data records of the type often required by legacy data systems.'!
-!provides: 'Records' 1 9!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2346] on 8 June 2015 at 5:31:35.743917 pm'!
+'Description Contains abstract classes RecordLayout and Field which are useful for defining fixed-length data records of the type often required by legacy data systems.'!
+!provides: 'Records' 1 10!
 !classDefinition: #ExampleGroup category: #'Records-Model'!
 Object subclass: #ExampleGroup
 	instanceVariableNames: 'seq payeesSub payeesTotal paidSub paidTotal payerTotal'
@@ -92,19 +92,20 @@ SizeTests class
 	instanceVariableNames: ''!
 
 
-!ExampleGroup commentStamp: 'dhn 1/19/2015 17:25' prior: 0!
-ExampleGroup gathers information and distributes it among the records of a set. It demonstrates the use of the RecordLayout and Field classes.
+!ExampleGroup commentStamp: 'dhn 6/8/2015 15:59' prior: 0!
+ExampleGroup gathers information and distributes it among the records of a set. It demonstrates the use of the RecordLayout and Field classes. To run the program, do (cmd-d) the following:
 
-	"ExampleGroup makeFile"
+	ExampleGroup makeFile.
 !
 
 !Field commentStamp: 'dhn 1/17/2015 17:21' prior: 0!
 A Field is a container for the location, size, justification, and padding of a field in a data record.
 !
 
-!RecordLayout commentStamp: '<historical>' prior: 0!
-RecordLayout is an abstract class used to form data records such as those which might be written to a file.
-!
+!RecordLayout commentStamp: 'dhn 6/8/2015 15:53' prior: 0!
+RecordLayout is an abstract class used to form data records such as those which might be written to a file. For more information, do (cmd-d) the following:
+
+	RecordLayout how.!
 
 !ExampleLayout commentStamp: '<historical>' prior: 0!
 ExampleLayout is used to set selected data fields in the records of ExampleGroup. Some of the information may span records.!
@@ -192,9 +193,11 @@ seq: anObject
 	"Set the value of seq"
 	seq _ anObject! !
 
-!ExampleGroup class methodsFor: 'as yet unclassified' stamp: 'dhn 1/19/2015 17:24'!
+!ExampleGroup class methodsFor: 'as yet unclassified' stamp: 'dhn 6/8/2015 15:58'!
 how
-	"ExampleGroup makeFile"
+"
+	ExampleGroup makeFile.
+"
 ! !
 
 !ExampleGroup class methodsFor: 'as yet unclassified' stamp: 'dhn 1/19/2015 17:23'!
@@ -368,9 +371,10 @@ initialize
 	self data: (self fieldDefaults: self class fields).
 ! !
 
-!RecordLayout class methodsFor: 'documentation' stamp: 'dhn 1/19/2015 11:20'!
-example
-	"Subclasses of RecordLayout should have a class method named #fields which defines the relationship among fields similar to the following example:
+!RecordLayout class methodsFor: 'documentation' stamp: 'dhn 6/8/2015 15:38'!
+explain
+	^
+	'Subclasses of RecordLayout should have a class method named #fields which defines the relationship among fields similar to the following example:
 	
 fields
 	^ Dictionary new
@@ -383,7 +387,7 @@ fields
 		at: #Sequence put: (Field rightJustifyAt: 500@507 with: $0);
 		at: #Blank3 put: (Field at: 508@748);
 		yourself
-"! !
+'! !
 
 !RecordLayout class methodsFor: 'documentation' stamp: 'dhn 1/19/2015 11:20'!
 fields
@@ -398,6 +402,12 @@ handler
 handler: anObject
 	"Set the value of Handler to anObject which handles relations among records"
 	Handler _ anObject! !
+
+!RecordLayout class methodsFor: 'documentation' stamp: 'dhn 6/8/2015 15:47'!
+how
+	(TextModelMorph withText: self explain)
+		morphExtent: 485@230;
+		openInHand.! !
 
 !RecordLayout class methodsFor: 'documentation' stamp: 'dhn 1/17/2015 15:04'!
 recl
