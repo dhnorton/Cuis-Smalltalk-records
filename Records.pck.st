@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2346] on 8 June 2015 at 5:31:35.743917 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2533] on 7 August 2015 at 4:35:09.44479 pm'!
 'Description Contains abstract classes RecordLayout and Field which are useful for defining fixed-length data records of the type often required by legacy data systems.'!
-!provides: 'Records' 1 10!
+!provides: 'Records' 1 11!
 !classDefinition: #ExampleGroup category: #'Records-Model'!
 Object subclass: #ExampleGroup
 	instanceVariableNames: 'seq payeesSub payeesTotal paidSub paidTotal payerTotal'
@@ -208,6 +208,13 @@ makeFile
 		initialAnswer: 'c:\worx\myoutfile.txt'.
 	self new realFile: fileName! !
 
+!Field methodsFor: 'accessing' stamp: 'dhn 7/2/2015 11:54'!
+at: anObject
+	"Set the receiver to anObject"
+	anObject class = Point
+		ifFalse: [^ anObject asPoint].
+	^ anObject! !
+
 !Field methodsFor: 'accessing' stamp: 'dhn 1/17/2015 14:44'!
 left
 	"Answer the value of left"
@@ -229,10 +236,10 @@ location
 	"Answer the value of location"
 	^ location! !
 
-!Field methodsFor: 'accessing' stamp: 'dhn 1/17/2015 14:44'!
-location: aPoint
+!Field methodsFor: 'accessing' stamp: 'dhn 8/7/2015 15:33'!
+location: anObject
 	"Set the value of location as from@to"
-	location _ aPoint! !
+	location _ anObject asPoint! !
 
 !Field methodsFor: 'accessing' stamp: 'dhn 1/17/2015 14:47'!
 pad
@@ -277,9 +284,9 @@ leftJustifyAt: aPoint
 leftJustifyAt: aPoint with: aCharacter
 	^ self at: aPoint left: true with: aCharacter! !
 
-!Field class methodsFor: 'coherent' stamp: 'dhn 1/17/2015 15:14'!
+!Field class methodsFor: 'coherent' stamp: 'dhn 8/7/2015 14:59'!
 rightJustifyAt: aPoint
-	^ self at: aPoint; left: false! !
+	^ self at: aPoint left: false! !
 
 !Field class methodsFor: 'coherent' stamp: 'dhn 1/17/2015 15:19'!
 rightJustifyAt: aPoint with: aCharacter
