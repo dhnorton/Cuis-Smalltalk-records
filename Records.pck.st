@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2533] on 7 August 2015 at 4:35:09.44479 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2533] on 9 August 2015 at 1:29:56.65481 pm'!
 'Description Contains abstract classes RecordLayout and Field which are useful for defining fixed-length data records of the type often required by legacy data systems.'!
-!provides: 'Records' 1 11!
+!provides: 'Records' 1 12!
 !classDefinition: #ExampleGroup category: #'Records-Model'!
 Object subclass: #ExampleGroup
 	instanceVariableNames: 'seq payeesSub payeesTotal paidSub paidTotal payerTotal'
@@ -341,29 +341,31 @@ fillWith: aCharacter for: aLength
 	1 to: aLength do: [:n | str at: n put: aCharacter].
 	^ str! !
 
-!RecordLayout methodsFor: 'accessing' stamp: 'dhn 1/17/2015 18:13'!
-for: aSymbol put: aString 
-	"Determine the size and justification (#left or #right) of a field named
-	aSymbol, place aString in it accordingly and pad it with the pad
-	character."
+!RecordLayout methodsFor: 'accessing' stamp: 'dhn 8/9/2015 12:58'!
+for: aSymbol put: aString
+	"Answer the contents of  of a field named  aSymbol, justifying it (#left or #right) and padding it with the pad	character, if required."
 	| field padding rest source str padChar |
+	
 	field _ self class fields at: aSymbol.
-	rest _ field length - aString basicSize.
+	rest _ field length - aString size.
+	padChar _ field pad.
 	source _ aString.
-	rest < 0
-		ifTrue: [Transcript 
+	
+	rest > 0 ifTrue: [
+		padding _ String new: rest.
+		1 to: rest do: [:n | padding at: n put: padChar]].
+	
+	rest = 0 ifTrue: [padding _ ''].
+	
+	rest < 0 ifTrue: [
+				Transcript 
 					nextPutAll: '''', aString, ''' for ', aSymbol, ' in ', self class asString, ' is too long.';
 					newLine.
-			padChar _ $!!.
-			source _ ''.
-			rest _ field length]
-		ifFalse: [padding _ ''.
-			padChar _ field pad].
-	rest > 0
-		ifTrue: [padding _ String new: rest.
-			1
-				to: rest
-				do: [:n | padding at: n put: padChar]].
+				padChar _ $!!.
+				source _ ''.
+				padding _ String new: field length.
+				1 to: field length do: [:n | padding at: n put: padChar]].
+			
 	str _ String new writeStream.
 	field left
 		ifTrue: [str nextPutAll: source.
