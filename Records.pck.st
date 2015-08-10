@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2533] on 10 August 2015 at 1:00:10.7629 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2533] on 10 August 2015 at 6:02:26.2939 pm'!
 'Description Contains abstract classes RecordLayout and Field which are useful for defining fixed-length data records of the type often required by legacy data systems.'!
-!provides: 'Records' 1 13!
+!provides: 'Records' 1 14!
 !classDefinition: #CompileFields category: #'Records-Model'!
 Object subclass: #CompileFields
 	instanceVariableNames: ''
@@ -120,7 +120,7 @@ RecordLayout is an abstract class used to form data records such as those which 
 !ExampleLayout commentStamp: '<historical>' prior: 0!
 ExampleLayout is used to set selected data fields in the records of ExampleGroup. Some of the information may span records.!
 
-!CompileFields class methodsFor: 'compiling' stamp: 'dhn 8/10/2015 12:53'!
+!CompileFields class methodsFor: 'compiling' stamp: 'dhn 8/10/2015 13:07'!
 from: array2 for: aClass
 	"Create a #fields class method in aClass class with fields defined in array2, an array of arrays"
 "
@@ -128,7 +128,7 @@ from: array2 for: aClass
 		#(#date    10)
 		#(#blank    1)
 		#(#name 14)
-	) for: #Test.
+	) for: Test.
 "
 	| str |
 	str _ String new writeStream.
@@ -140,7 +140,7 @@ from: array2 for: aClass
 		nextPutAll: '		yourself'; newLine.
 	aClass class compile: str contents! !
 
-!CompileFields class methodsFor: 'compiling' stamp: 'dhn 8/10/2015 11:13'!
+!CompileFields class methodsFor: 'compiling' stamp: 'dhn 8/10/2015 17:58'!
 translateLengths: array2
 	"Answer the field names, lengths,  justification, and padding translated into dictionary entries"
 	"array2 is an array of arrays"
@@ -151,16 +151,95 @@ translateLengths: array2
 		str 
 			nextPutAll: '		at: #';
 			nextPutAll: ea first;
-			nextPutAll: ' put: (Field at: ';
-			nextPutAll: pos asString.
-			pos _ pos + ea second.
-			ea second > 1
+			nextPutAll: ' put: (Field '.
+			
+			ea size = 2
 				ifTrue: [
+					str nextPutAll: 'at: ';
+					nextPutAll: pos asString.
+					pos _ pos + ea second.
+					ea second > 1
+						ifTrue: [
+							str 
+								nextPut: $@;
+								nextPutAll: (pos - 1) asString].
+					str	nextPutAll: ');'; newLine].
+				
+			ea size = 3 
+			ifTrue: [
+				str nextPutAll: (self translateTriple: ea at: pos).
+				pos _ pos + ea second].
+			
+			ea size = 4
+				ifTrue: [
+					str nextPutAll: 'at: ';
+					nextPutAll: pos asString.
+					pos _ pos + ea second.
 					str 
 						nextPut: $@;
-						nextPutAll: (pos - 1) asString].
-			str	nextPutAll: ');'; newLine].
-	^ str contents! !
+						nextPutAll: (pos - 1) asString;
+						nextPutAll: ' left: ';
+						nextPutAll: ea third asString;
+						nextPutAll: ' with: $';
+						nextPutAll: ea fourth asString;
+						nextPutAll: ');'; newLine].
+		].
+				
+	^ str contents
+
+"
+Arrays in the array of arrays can be as follows:
+
+(#name		size)	which produces:
+	at: #name put: (Field at: aPoint);
+
+(#name		size	pad)	pad is a character, which produces:
+	at: #name put: (Field at: aPoint left: true with: pad);
+	
+(#name		1		pad)	which produces:
+	at: #name put: (Field character: pad at: position);
+
+(#name		size	justification)	justification is a boolean, which produces:
+	at: #name put: (Field at: aPoint left: justification);
+
+(#name		size	justification	pad)	which produces:
+	at: #name put: (Field at: aPoint left: justification with: pad);
+
+"! !
+
+!CompileFields class methodsFor: 'compiling' stamp: 'dhn 8/10/2015 17:55'!
+translateTriple: ea at: position
+	"Answer the remainder of the dictionary entry for: 
+		#(#name size pad),
+		#(#name 1 pad), or
+		#(#name size justification)"
+	| str pos |
+	pos _ position.
+	str _ String new writeStream.
+	ea second = 1
+		ifTrue: [
+			str
+				nextPutAll: 'character: $';
+				nextPutAll: ea third asString;
+				nextPutAll: ' at: ';
+				nextPutAll: pos asString;
+				nextPutAll: ');'; newLine]
+		ifFalse: [
+			str
+				nextPutAll: 'at: ';
+				nextPutAll: pos asString.
+				pos _ pos + ea second.
+			str
+				nextPut: $@;
+				nextPutAll: (pos - 1) asString;
+				nextPutAll: ' left: '.
+			ea third class = Character
+				ifTrue: [str nextPutAll: 'true with: $'].
+			str 
+				nextPutAll: ea third asString;
+				nextPutAll: ');'; newLine].
+	^ str contents
+		! !
 
 !ExampleGroup methodsFor: 'as yet unclassified' stamp: 'dhn 1/19/2015 17:27'!
 initialize
@@ -319,13 +398,14 @@ at: aPoint left: aBool with: aCharacter
 	"Establish aCharacter as the padding character for the receiver. Data in the receiver will be left-justified if aBool is true and right-justified otherwise. The first position of the receiver is aPoint x; the last is aPoint y"
 	^ self new location: aPoint; left: aBool; pad: aCharacter! !
 
-!Field class methodsFor: 'basic' stamp: 'dhn 1/17/2015 14:53'!
+!Field class methodsFor: 'basic' stamp: 'dhn 8/10/2015 13:17'!
 at: aLocation with: aCharacter
 	"Establish a single character for the receiver (not for strings). The first position of the receiver is aPoint x; the last is aPoint y"
-	^ self new location: aLocation@aLocation; pad: aCharacter! !
+	^ self new location: aLocation; pad: aCharacter! !
 
-!Field class methodsFor: 'coherent' stamp: 'dhn 1/17/2015 15:49'!
+!Field class methodsFor: 'coherent' stamp: 'dhn 8/10/2015 13:15'!
 character: aCharacter at: aLocation
+	"Specify a literal character of value aCharacter at aLocation"
 	^ self at: aLocation with: aCharacter! !
 
 !Field class methodsFor: 'coherent' stamp: 'dhn 1/17/2015 15:13'!
