@@ -1,6 +1,16 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2533] on 9 August 2015 at 1:29:56.65481 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2533] on 10 August 2015 at 1:00:10.7629 pm'!
 'Description Contains abstract classes RecordLayout and Field which are useful for defining fixed-length data records of the type often required by legacy data systems.'!
-!provides: 'Records' 1 12!
+!provides: 'Records' 1 13!
+!classDefinition: #CompileFields category: #'Records-Model'!
+Object subclass: #CompileFields
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Records-Model'!
+!classDefinition: 'CompileFields class' category: #'Records-Model'!
+CompileFields class
+	instanceVariableNames: ''!
+
 !classDefinition: #ExampleGroup category: #'Records-Model'!
 Object subclass: #ExampleGroup
 	instanceVariableNames: 'seq payeesSub payeesTotal paidSub paidTotal payerTotal'
@@ -109,6 +119,48 @@ RecordLayout is an abstract class used to form data records such as those which 
 
 !ExampleLayout commentStamp: '<historical>' prior: 0!
 ExampleLayout is used to set selected data fields in the records of ExampleGroup. Some of the information may span records.!
+
+!CompileFields class methodsFor: 'compiling' stamp: 'dhn 8/10/2015 12:53'!
+from: array2 for: aClass
+	"Create a #fields class method in aClass class with fields defined in array2, an array of arrays"
+"
+	CompileFields from: #(
+		#(#date    10)
+		#(#blank    1)
+		#(#name 14)
+	) for: #Test.
+"
+	| str |
+	str _ String new writeStream.
+	str 
+		nextPutAll: 'fields'; newLine;
+		nextPutAll: '	"Answer the record definition consisting of field names and positions"'; newLine;
+		nextPutAll: '	^ Dictionary new'; newLine;
+		nextPutAll: (self translateLengths: array2);
+		nextPutAll: '		yourself'; newLine.
+	aClass class compile: str contents! !
+
+!CompileFields class methodsFor: 'compiling' stamp: 'dhn 8/10/2015 11:13'!
+translateLengths: array2
+	"Answer the field names, lengths,  justification, and padding translated into dictionary entries"
+	"array2 is an array of arrays"
+	| str pos |
+	str _ String new writeStream.
+	pos _ 1.
+	array2 do: [:ea |
+		str 
+			nextPutAll: '		at: #';
+			nextPutAll: ea first;
+			nextPutAll: ' put: (Field at: ';
+			nextPutAll: pos asString.
+			pos _ pos + ea second.
+			ea second > 1
+				ifTrue: [
+					str 
+						nextPut: $@;
+						nextPutAll: (pos - 1) asString].
+			str	nextPutAll: ');'; newLine].
+	^ str contents! !
 
 !ExampleGroup methodsFor: 'as yet unclassified' stamp: 'dhn 1/19/2015 17:27'!
 initialize
