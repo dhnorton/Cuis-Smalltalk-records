@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2533] on 10 August 2015 at 6:02:26.2939 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2533] on 10 August 2015 at 9:26:26.5649 pm'!
 'Description Contains abstract classes RecordLayout and Field which are useful for defining fixed-length data records of the type often required by legacy data systems.'!
-!provides: 'Records' 1 14!
+!provides: 'Records' 1 15!
 !classDefinition: #CompileFields category: #'Records-Model'!
 Object subclass: #CompileFields
 	instanceVariableNames: ''
@@ -120,7 +120,7 @@ RecordLayout is an abstract class used to form data records such as those which 
 !ExampleLayout commentStamp: '<historical>' prior: 0!
 ExampleLayout is used to set selected data fields in the records of ExampleGroup. Some of the information may span records.!
 
-!CompileFields class methodsFor: 'compiling' stamp: 'dhn 8/10/2015 13:07'!
+!CompileFields class methodsFor: 'compiling' stamp: 'dhn 8/10/2015 21:03'!
 from: array2 for: aClass
 	"Create a #fields class method in aClass class with fields defined in array2, an array of arrays"
 "
@@ -530,7 +530,7 @@ fields
 		yourself
 '! !
 
-!RecordLayout class methodsFor: 'documentation' stamp: 'dhn 1/19/2015 11:20'!
+!RecordLayout class methodsFor: 'documentation' stamp: 'dhn 8/10/2015 21:23'!
 fields
 	self error: '#fields should be implemented in subclasses of RecordLayout.'! !
 
